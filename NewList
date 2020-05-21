@@ -1,0 +1,79 @@
+
+trait ListNew[+T]
+  case class const[T](val head: T,val tail: ListNew[T])extends  ListNew[T]
+  case object Null extends ListNew[Nothing]
+
+
+object ListNew {
+
+  def apply[T]( items : T* ) : ListNew[T] = {
+    if (items.isEmpty) {
+      Null
+    } else {
+      const(items.head, apply(items.tail: _*))
+    }
+  }
+
+  def tail[T](xs: ListNew[T]) : ListNew[T] = xs match{
+
+    case Null => throw new Error("last element ")
+    case const(x,xs1) => xs1
+
+  }
+
+  def drop[T](xs: ListNew[T], N: Int): ListNew[T] = {
+
+    if(N<=0) xs
+    else  xs match{
+      case Null => Null
+      case const(x,xs1) => drop(xs1,N-1)
+  }
+
+}
+
+  def setHead[T](xs: ListNew[T])(y: T): ListNew[T] = xs match {
+    case Null => throw new Error("no head exists")
+    case const(x,xs1) => const(y,xs)
+  }
+  def ++[T](xs: ListNew[T], ys: ListNew[T]): ListNew[T] = xs match {
+    case Null => ys
+    case const(t,ts) => const(t, ++(ts,ys))
+  }
+
+  def dropWhile[A](l: ListNew[A])(f: A => Boolean): ListNew[A]= l match{
+
+    case Null => Null
+      case const(x,xs1) => if(f(x)) dropWhile(xs1)(f)
+        else l
+    }
+
+  def init[A](l: ListNew[A]): ListNew[A] = l match{
+    case Null => throw new Error("init is not applicable")
+    case const(y,Null) => Null
+    case const(x,xs1) => const(x,init(xs1))
+  }
+
+  def reverse[T](xs: ListNew[T]): ListNew[T] = xs match{
+    case Null => Null
+    case const(y,ys) => ++(reverse(ys),ListNew(y))
+  }
+
+  def length[T](xs: ListNew[T]): Int= xs match{
+    case Null =>0
+    case const(y,ys) =>1+length(ys)
+
+  }
+  def filter[T](xs: ListNew[T],d:T => Boolean): ListNew[T]= xs match{
+    case Null => Null
+    case const(x,xs1) =>
+      if(d(x))
+        const(x,filter(xs1,d))
+      else
+        filter(xs1,d)
+  }
+  
+  def foldRight[A,B](xs: List[A],z: B)(f: (A,B) => B):B = xs match{
+  case Nil => z
+  case x::xs1 => f(x,foldRight(xs1,z)(f))
+}
+}
